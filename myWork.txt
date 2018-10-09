@@ -5,4 +5,3 @@ Me:
 
 Brian:
     -Start looking at traversal logic and maybe start implemenetation.
-    test again
