@@ -1,0 +1,67 @@
+Group_A:
+Almotawah	 Mohamed	m.almotawah@vikes.csuohio.edu
+Calfee	 Jacob	j.calfee@vikes.csuohio.edu
+
+
+Group_B:
+Dezember	 Justine	J.DEZEMBER@vikes.csuohio.edu
+Patel	 Harshkumar	H.M.PATEL77@vikes.csuohio.edu
+
+
+Group_C:
+Gorti	 Nikhil	n.gorti@vikes.csuohio.edu
+Kian	 Nejadfard	k.nejadfard@vikes.csuohio.edu
+
+
+Group_D:
+Harb	 Charlie	C.P.HARB@vikes.csuohio.edu
+Henderson	 Ronald	r.l.henderson@vikes.csuohio.edu
+
+
+Group_E:
+Hoang	 Kevin	k.v.hoang@vikes.csuohio.edu
+Itanna	 Yohannes	y.itanna@vikes.csuohio.edu
+
+
+Gruop_F:
+Ivashchuk	 Taras	T.IVASHCHUK@vikes.csuohio.edu
+Karaca	 Ilker	i.karaca@vikes.csuohio.edu
+
+
+Group_G:
+Kruszniewski	 Daniel	d.kruszniewski@vikes.csuohio.edu
+Lai	 Yuk Kwan	y.lai27@vikes.csuohio.edu
+
+
+Group_H:
+Lopez	 Raymond	r.b.lopez39@vikes.csuohio.edu
+McDonough	 Ryan	R.S.MCDONOUGH@vikes.csuohio.edu
+
+
+Group_I:
+McNally	 Brian	b.r.mcnally@vikes.csuohio.edu
+Meadwell	 Matthew	m.meadwell@vikes.csuohio.edu
+
+
+Group_J:
+Matthew	Nathal 		m.nathal@vikes.csuohio.edu
+Mohammad	 Shareen	s.mohammad75@vikes.csuohio.edu
+
+
+Group_K:
+Chiu	 Lawrence	L.CHIU@vikes.csuohio.edu
+Patel	 Karan	k.y.patel@vikes.csuohio.edu
+
+
+Group_L:
+Pereira-Castillo	 Renato	R.PEREIRACASTILLO@vikes.csuohio.edu
+Richards	 Andrew	a.p.richards55@vikes.csuohio.edu
+
+
+Group_M:
+Urioste	 Andrew	a.urioste@vikes.csuohio.edu
+Widdowson	 Scott	S.WIDDOWSON@vikes.csuohio.edu
+
+
+Group_N:
+Buhamad	 Yousef A J M H	y.buhamad@vikes.csuohio.edu

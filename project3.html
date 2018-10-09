@@ -1,0 +1,282 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
+<head> 
+<title>CIS 340 (Fall 2015) Project 3</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" /> 
+<link rel="STYLESHEET" href="../../class.css" type="text/css" /> 
+</head> 
+<body>
+
+<h4>Project3: A Floppy Disk Program (Due at 11:59:59pm on 10/21/2018 (EDT))</h4>
+
+<h4><a href="./group_p3.txt">Group Arrangment.</a></h4>
+
+<p>You are asked to develop a Floppy Disk program that allows users to
+access a floppy disk locally mounted on a computer. You are expected to 
+use C programming language. In your program, all file I/O related operations 
+should use the system calls discussed in our lectures, including <code>open(), 
+read(), write(), lseek(), close()</code>, and you should not use those library
+functions like <code>fopen()</code> and <code>fread()</code>.
+Your implementation must work on Linux machine in FH133 lab.  </p>
+
+<h4> Required Modules: </h4>
+
+<ol>
+
+<li>
+[90%] Client Environment (a floppy console): the console (interface) allows users to access the floppy by using the following commands:
+<ul>
+<li>[5%] <tt>help</tt>: show the commands supported in the floppy shell. </li>
+<li>[5%] <tt>fmount argument</tt>: mount a local floppy disk, where "argument" is a floppy image file, e.g., <tt>imagefile.img</tt>. </li>
+<li>[5%] <tt>fumount</tt>: umount the mounted floppy disk. </li>
+<li>[10%] <tt>structure</tt>: to list the structure of the floppy disck.  For example:
+<pre>
+flop: structure
+		number of FAT:			    2
+		number of sectors used by FAT:	    9
+		number of sectors per cluster:	    1
+		number of ROOT Entries:		  224
+		number of bytes per sector:	  512
+		---Sector #---     ---Sector Types---
+		      0                  BOOT       
+		   01 -- 09              FAT1         
+		   10 -- 18              FAT2         
+		   19 -- 32              ROOT DIRECTORY
+
+</pre>
+Note that the above numbers should be extracted from the floppy disk rather than being hard coded (you won't received any credit for the hard coding).
+
+</li>
+<li>[20%] <tt>traverse [-l]</tt>: list the content in the root directory.  For example:
+<pre>
+flop: traverse
+/A.CLA
+/ALOOP1.CLA
+/ALOOP1.JAV
+/ALOOP2.CLA
+/ALOOP2.JAV
+/ALOOP3.CLA
+/ALOOP3.JAV
+/B.CLA
+/CONDIT.CLA
+/CONDIT.JAV
+/D.CLA
+/DEMO.CLA
+/DEMO.JAV
+/DIR1                                           &ltDIR&gt
+/DIR1/.                                         &ltDIR&gt
+/DIR1/..                                        &ltDIR&gt
+/DIR1/DIR2                                      &ltDIR&gt
+/DIR1/DIR2/.                                    &ltDIR&gt
+/DIR1/DIR2/..                                   &ltDIR&gt
+/DIR1/DIR2/FILE3
+/DIR1/C.CLA
+/POLYTEST.CLA
+/POLYTEST.JAV
+/SOME.CLA
+</pre>
+When switch -l is turned on (long list), all detailed information is shown, including the file attribute, last modified time, file size (in bytes), the path name and the starting logical cluster ID.  For example:
+<pre>
+flop: traverse -l
+        *****************************
+        ** FILE ATTRIBUTE NOTATION **
+        **                         **
+        ** R ------ READ ONLY FILE **
+        ** S ------ SYSTEM FILE    **
+        ** H ------ HIDDEN FILE    **
+        ** A ------ ARCHIVE FILE   **
+        *****************************
+
+-A---     10/27/2014 13:13:05               670     /A.CLA                                           3
+-A---     10/27/2014 13:13:05               763     /ALOOP1.CLA                                      5
+-A---     10/27/2014 13:13:05               333     /ALOOP1.JAV                                      7
+-A---     10/27/2014 13:13:05               786     /ALOOP2.CLA                                      8
+-A---     10/27/2014 13:13:05               404     /ALOOP2.JAV                                     10
+-A---     10/27/2014 13:13:05               786     /ALOOP3.CLA                                     11
+-A---     10/27/2014 13:13:05               408     /ALOOP3.JAV                                     13
+-A---     10/27/2014 13:13:05               358     /B.CLA                                          14
+-A---     10/27/2014 13:13:05              1067     /CONDIT.CLA                                     15
+-A---     10/27/2014 13:13:05               444     /CONDIT.JAV                                     18
+-A---     10/27/2014 13:13:05               508     /D.CLA                                          19
+-A---     10/27/2014 13:13:05               967     /DEMO.CLA                                       20
+-A---     10/27/2014 13:13:05               648     /DEMO.JAV                                       22
+-----     10/27/2014 13:13:05        &ltDIR&gt          /DIR1                                           24
+-----     10/27/2014 13:13:05        &ltDIR&gt          /DIR1/.                                         24
+-----     10/27/2014 13:13:05        &ltDIR&gt          /DIR1/..                                         0
+-----     10/27/2014 13:13:05        &ltDIR&gt          /DIR1/DIR2                                      25
+-----     10/27/2014 13:13:05        &ltDIR&gt          /DIR1/DIR2/.                                    25
+-----     10/27/2014 13:13:05        &ltDIR&gt          /DIR1/DIR2/..                                   24
+-A---     10/27/2014 13:13:05                11     /DIR1/DIR2/FILE3                                26
+-A---     10/27/2014 13:13:05               427     /DIR1/C.CLA                                     27
+-A---     10/27/2014 13:13:05               630     /POLYTEST.CLA                                   28
+-A---     10/27/2014 13:13:05              1063     /POLYTEST.JAV                                   30
+-A---     10/27/2014 13:13:05               226     /SOME.CLA                                       33
+
+</pre>
+</li>
+<li>[10%] <tt>showsector [sector number]</tt>: show the content (in the form of hex dump) of the specified sector number (512 bytes for each sector).  For example:
+<pre>
+flop: showsector 10
+       0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
+
+   0  F0  FF  FF   0  40   0  FF  6F   0  FF  FF  FF   9  F0  FF  FF
+  10  CF   0  FF  FF  FF  FF   F   1  11  F0  FF  FF  FF  FF  15  F0
+  20  FF  17  F0  FF  FF  FF  FF  FF  FF  FF  1D  F0  FF  1F   0   2
+  30  FF  FF  FF   0   0   0   0   0   0   0   0   0   0   0   0   0
+  40   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+  50   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+  60   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+  70   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+  80   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+  90   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+  A0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+  B0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+  C0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+  D0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+  E0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+  F0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+ 100   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+ 110   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+ 120   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+ 130   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+ 140   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+ 150   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+ 160   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+ 170   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+ 180   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+ 190   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+ 1A0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+ 1B0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+ 1C0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+ 1D0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+ 1E0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+ 1F0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+
+
+</pre>
+
+</li>
+<li>[15%] <tt>showfat</tt>: show the contents of the first 256 entries in the FAT table (in the hex dump).</li>
+<pre>
+flop: showfat
+         0    1    2    3    4    5    6    7    8    9    a    b    c    d    e    f
+                FREE    4  fff    6  fff  fff    9  fff  fff    c  fff  fff  fff   10
+   10   11  fff  fff  fff   15  fff   17  fff  fff  fff  fff  fff   1d  fff   1f   20
+   20  fff  fff FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE
+   30 FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE
+   40 FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE
+   50 FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE
+   60 FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE
+   70 FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE
+   80 FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE
+   90 FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE
+   a0 FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE
+   b0 FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE
+   c0 FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE
+   d0 FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE
+   e0 FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE
+   f0 FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE FREE
+</pre>
+Note: you are expected to interpret the raw FAT data to a readable format as show above, i.e., extract the 12-bit entry value and reconstruct a FAT table with the cluster indices (the first column and the first row).  If the cluster entry is free, please print "FREE" as the content.
+</li>
+<li>[15%]<tt>showfile [filename]</tt>: show the content of the target file (in the hex dump).
+<pre>
+flop: showfile /ALOOP1.JAV
+
+   70   75   62   6c   69   63   20   63   6c   61   73   73   20   41   6c   6f
+   6f   70   31   20   7b    a   20   20   20   20   70   75   62   6c   69   63
+   20   73   74   61   74   69   63   20   76   6f   69   64   20   6d   61   69
+   6e   28   53   74   72   69   6e   67   5b   5d   20   61   72   67   73   29
+   20   7b    a    9    a    9   53   74   72   69   6e   67   5b   5d   20   72
+   61   6e   6b   20   3d   20   7b   22   44   45   55   43   45   22   2c   20
+   22   54   48   52   45   45   22   2c   20   22   46   4f   55   52   22   2c
+   20   22   46   49   56   45   22   2c   20   22   53   49   58   22   2c   20
+   22   53   45   56   45   4e   22   2c    a    9    9    9   20   22   45   49
+   47   48   54   22   2c   20   22   4e   49   4e   45   22   2c   20   22   54
+   45   4e   22   2c   20   22   4a   41   43   4b   22   2c   20   22   51   55
+   45   45   4e   22   2c   20   22   4b   49   4e   47   22   2c   20   22   41
+   43   45   22   7d   3b    a    9    a    9   69   6e   74   20   69   20   3d
+   20   30   3b    a    9   69   6e   74   20   63   6f   75   6e   74   65   72
+   20   3d   20   30   3b    a    9   77   68   69   6c   65   20   28   21   72
+   61   6e   6b   5b   69   5d   2e   65   71   75   61   6c   73   28   22   53
+   49   58   22   29   29   20   7b    a    9   20   20   20   20   69   2b   2b
+   3b    a    9   20   20   20   20   63   6f   75   6e   74   65   72   2b   2b
+   3b    a    9   7d    a    9   53   79   73   74   65   6d   2e   6f   75   74
+   2e   70   72   69   6e   74   6c   6e   28   63   6f   75   6e   74   65   72
+   29   3b    a    a   20   20   20   20   7d    a   7d    a    a    0    0    0
+    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+
+</pre>
+</li>
+<li>[5%] <tt>quit</tt>: quit the floppy shell. </li>
+</ul>
+
+</li>
+
+<li>[5%] Provide a Makefile so <tt>make</tt> command would produce the executable.</li>
+<li>
+[5%] Write-up: 
+<ul>
+<li>Please take a group picture inside FH128 and copy the JPEG file into the submission folder.</li>
+<li>
+you are required to write a README document (in TXT format only) that
+describes your project design detail and the execution sequence (with the commands).
+In particular, please explicitly state which part, if there is any, does not work and 
+the possible reasons why that module does not work.  For those working modules, please give
+a brief (in short) sample output.  In particular, you have to follow the format below:
+<pre>
+1. Your Group Members;
+2. The contribution (percentage) of the members;
+3. Project description;
+4. The compile instruction and execution command;
+5. Sample execution results (for each command);
+6. Existing bugs (if there is).
+</pre>
+</li>
+</ul>
+</li>
+
+
+</ol>
+
+<li>It is not easy to find a computer equipped with a floppy disk drive, but we can use 
+<tt>mount</tt> utility to easily create a virtual floppy disk device.<br>
+For your convenience, we provide an example floppy image: <a href="imagefile.img">
+imagefile.img</a>. <br>
+You may also create your own floppy image by following instructions (on your own computers only):<br>
+<pre>
+Create an empty floppy image: (here 1.44MB)
+<tt> $ dd bs=512 count=2880 if=/dev/zero of=./imagefile.img</tt>
+Format it:
+<tt> $ mkfs.msdos ./imagefile.img </tt>
+
+</pre>
+
+Once an image is ready, you can simply open the image file in your program to access the floppy disk:
+<pre>
+<tt> $ sudo mkdir /media/floppy/ </tt>
+<tt> $ sudo mount ./imagefile.img /media/floppy/ </tt> 
+</pre>
+Now you can do any normal disk operations on this virtual floppy disk. Note that your current floppy image file is empty (no file and directory).  Next, you may copy files and create directories in /media/floppy.  As the result, the mounted image file: imagefile.img, will be automatically updated.  Once you are done, please umount the /media/floppy, and your imagefile.img with your own data is ready to be used.  To access this virtual floppy disk, you can simply open the image file in your program.
+</li>
+
+</ol>
+
+<h4>Submission:</h4>
+<ul>
+<li>Create a folder with the name of your group ID, e.g., Group_A.</li>
+<li>Copy all source code files/directories, along with your group picture, into the created folder.</li>
+<li>Make sure you have sshed to grail.eecs.csuohio.edu, and then go to the parent directory of your group folder, i.e., Group_A, then type:<br> 
+<tt> $ turnin -c cis340w -p proj3 Group_A</tt></li>
+</ul>
+</body>
+</hmtl>
