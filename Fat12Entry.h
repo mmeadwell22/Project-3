@@ -1,18 +1,19 @@
 #ifndef FAT12ENTRY_H
 #define FAT12ENTRY_H
 
-struct FatEntry {
-    unsigned char FILENAME[8];
-    unsigned char EXT[3];
-    unsigned char ATTRIBUTES[1];
-    unsigned char RESERVED[2];
-    unsigned short CREATION_TIME;
-    unsigned short CREATION_DATE;
-    unsigned short LAST_ACCESS_DATE;
-    unsigned short MODIFY_TIME;
-    unsigned short MODIFY_DATE;
-    unsigned short START_CLUSTER;
-    unsigned long FILE_SIZE;
+struct Fat12Entry {
+    unsigned char FILENAME[8];//8
+    unsigned char EXT[3];//3
+    unsigned char ATTRIBUTES[1];//1
+    unsigned char RESERVED[2];//2
+    unsigned short CREATION_TIME;//2
+    unsigned short CREATION_DATE;//2
+    unsigned short LAST_ACCESS_DATE;//2
+    //ignore 2
+    unsigned short LAST_WRITE_TIME;//2
+    unsigned short LAST_WRITE_DATE;//2
+    unsigned short START_CLUSTER;//2
+    unsigned long FILE_SIZE;//4
 };
 
 #endif

@@ -4,10 +4,10 @@
 void load();
 void mount();
 void unmount();
-void structure(int l);
+void structure();
 void traverse(int l);
 void showfat();
-void showsector(int sector);
+void showsector(int l);
 void showfile(char *file);
 
 #endif

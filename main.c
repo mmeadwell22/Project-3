@@ -16,7 +16,6 @@ int getInput(char *input)
 {
     if (strstr(input, "quit") == input)
     {
-        printf("closing...\n");
         return 1;
     }
     if (strstr(input, "help") == input)
@@ -34,6 +33,22 @@ int getInput(char *input)
     if (strstr(input, "funmount") == input)
     {
         return 5;
+    }
+    if(strstr(input, "structure") == input)
+    {
+        return 6;
+    }
+    if(strstr(input, "test") == input)
+    {
+        return 7;
+    }
+    if(strstr(input, "showfat") == input)
+    {
+        return 8;
+    }
+    if(strstr(input, "showsector") == input)
+    {
+        return 9;
     }
 
     return 0;
@@ -64,6 +79,7 @@ int main()
         {
         case 1:
             q = 0;
+            printf("closing...\n");
             break;
         case 2:
             printf("\nPlease enter one of the following commands.\n help, fmount, funmount, structure, traverse, showsector, showfat, showfile, quit\n");
@@ -80,14 +96,25 @@ int main()
             mount(holder);
             break;
         case 5:
-            // holder += strlen("FUNMOUNT");
-            // while(*holder == ' ')
-            // {
-            //     holder++;
-            // }
             unmount();
             break;
         case 6:
+            structure();
+            break;
+        case 7:
+            break;
+        case 8:
+            showfat();
+            break;
+        case 9:
+            holder += strlen("showsector");
+            while(*holder == ' ')
+            {
+                holder++;
+            }
+            int secNum = atoi(holder); 
+            showsector(secNum);
+            break;
         default:
             printf("\n%s not a valid command\n", input);
         }

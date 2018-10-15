@@ -1,3 +1,4 @@
 Matt:
-
+    showfat is finished 
+    showsector is finished
 Brian:
