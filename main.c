@@ -38,7 +38,7 @@ int getInput(char *input)
     {
         return 6;
     }
-    if(strstr(input, "test") == input)
+    if(strstr(input, "traverse") == input)
     {
         return 7;
     }
@@ -102,6 +102,19 @@ int main()
             structure();
             break;
         case 7:
+            holder += strlen("traverse");
+            while(*holder == ' ')
+            {
+                holder++;
+            }
+            if(holder[0] == '\0') 
+            {
+                traverse(0);
+            }
+            else
+            {
+                traverse(1);
+            }
             break;
         case 8:
             showfat();
@@ -119,6 +132,5 @@ int main()
             printf("\n%s not a valid command\n", input);
         }
     }
-
     return 0;
 }

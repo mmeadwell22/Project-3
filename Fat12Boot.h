@@ -12,7 +12,7 @@ struct FatBoot{
     unsigned int SECTOR_PER_TRACK;
     unsigned int NUMBER_OF_HEADS;
     unsigned int VOLUME_ID;
-    unsigned int VOLUME_LABEL;
+    unsigned char VOLUME_LABEL[11];
 };
 
 #endif

@@ -2,6 +2,6 @@ Me:
     -Starting client environment
     -Get floppy shell working
     -Start the ability to mount an image file.
-
+    - gcc -Wall -g -o proj3 main.c boot.c -I.
 Brian:
     -Start looking at traversal logic and maybe start implemenetation.

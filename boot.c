@@ -7,18 +7,28 @@
 #include "Fat12Boot.h"
 #include "Fat12Entry.h"
 
+#define READ_ONLY_MASK 0x01
+#define HIDDEN_MASK 0x02
+#define SYSTEM_MASK 0x04
+#define VOLUME_LABEL_MASK 0x08
+#define SUBDIRECTORY_MASK 0x10
+#define ARCHIVE_MASK 0x20
+#define DAY_MASK 0x001F
+#define MONTH_MASK 0x01E0
+#define YEAR_MASK 0xFE00
+#define HOUR_MASK 0xF800
+#define MIN_MASK 0x07E0
+#define SEC_MASK 0x01F
+
 
 char *imgName;
 int fileDesc;
 struct FatBoot boot;
-//struct Fat12Entry entry[6656];
+struct Fat12Entry entry[6656];
 
 unsigned char buf[4608];
 unsigned char allEntry[6656];
 unsigned short fat[4608];
-//unsigned short fat2[2880];
-
-//Fat12Entry buf[4096];
 
 
 void readImg()
@@ -48,7 +58,7 @@ void readImg()
     read(fileDesc, &boot.VOLUME_ID, 4);
 
     read(fileDesc, &boot.VOLUME_LABEL, 11);
-
+    
     lseek(fileDesc, boot.BYTES_PER_SECTOR, SEEK_SET);
 
     //start of fat table # 1
@@ -57,7 +67,7 @@ void readImg()
     int i;
     int j = 0;
 
-    //reading fat table
+    //reading the fat table
     for(i = 0; i < sizeof(buf) / 3; i++)
     {
 
@@ -72,66 +82,55 @@ void readImg()
         j++;
     }
 
-    // int k;
-    // for(k = 0; k < 100; k++)
-    // {
-    //     printf("Just testing %X\n", fat[k]);
-    // }
+    //going to root directory
+    lseek(fileDesc, ((boot.NUMBER_OF_FATS * boot.SECTORS_PER_FAT) + 1) * boot.BYTES_PER_SECTOR, SEEK_SET);
+    
+    //reading root directory
+    read(fileDesc, allEntry, 6656);
 
-    //((2 * 9) + 1) * 512 = 530
-    //lseek(fileDesc, ((boot.NUMBER_OF_FATS * boot.SECTORS_PER_FAT) + 1) * boot.BYTES_PER_SECTOR, SEEK_SET);
+    unsigned char temp[32];
+    //unsigned char test[32];2 9728
+    //unsigned char subEntries[boot.BYTES_PER_SECTOR];
+    int l;
+    int m;
+    //int p;
+    int n = 0;
+    int f = 0;
+    //int x = 0;
+    //int counter = 2; 9728
 
-    //read(fileDesc, allEntry, 6656);
+    for(l = 0; l < boot.MAX_ROOT_DIRS; l++)
+    {
+        for(m = 0; m < 32; m++)
+        {
+            temp[m] = allEntry[n];
+            n++;
+        }
+        if(temp[26] == 0 && temp[27] == 0)
+        {
+            //printf("not a valid entry\n");
+        }
+        else if(temp[0] == 0 || temp[0] == 0xE5)
+        {
+            //printf("not a valid entry because deleted\n");
+        }
+        else
+        {
+            memcpy(entry[f].FILENAME, temp, 8);
+            memcpy(entry[f].EXT, temp + 8, 3);
+            memcpy(entry[f].ATTRIBUTES, temp + 11, 1);
+            memcpy(entry[f].RESERVED, temp + 12, 2);
+            memcpy(&entry[f].CREATION_TIME, temp + 14, 2);
+            memcpy(&entry[f].CREATION_DATE, temp + 16, 2);
+            memcpy(&entry[f].LAST_ACCESS_DATE, temp + 18, 2);
+            memcpy(&entry[f].LAST_WRITE_TIME, temp + 22, 2);
+            memcpy(&entry[f].LAST_WRITE_DATE, temp + 24, 2);
+            memcpy(&entry[f].START_CLUSTER, temp + 26, 2);
+            memcpy(&entry[f].FILE_SIZE, temp + 28, 4);
 
-    //int z;
-
-    // for(z = 0; z < boot.MAX_ROOT_DIRS; z++)
-    // {
-        //int test2 = read(fileDesc, &entry[0].FILENAME, 8);
-        //read(fileDesc, &entry[0].EXT, 3);
-        //printf("The number of bytes read filename %d\n", test2);
-        //printf("The number of bytes read ext %d\n", test3);
-        //printf("File name is %.8s\n", entry[0].FILENAME);
-        //printf("Extension is %.3s\n", entry[0].EXT);
-
-    //     read(fileDesc, &entry[z].ATTRIBUTES, 1);
-
-    //     read(fileDesc, &entry[z].RESERVED, 2);
-
-    //     read(fileDesc, &entry[z].CREATION_TIME, 2);
-
-    //     read(fileDesc, &entry[z].CREATION_DATE, 2);
-
-    //     read(fileDesc, &entry[z].LAST_ACCESS_DATE, 2);
-
-    //     read(fileDesc, &entry[z].CREATION_TIME, 2);
-
-    //     lseek(fileDesc, 2, SEEK_CUR);
-
-    //     read(fileDesc, &entry[z].LAST_WRITE_TIME, 2);
-
-    //     read(fileDesc, &entry[z].LAST_WRITE_DATE, 2);
-
-    //     read(fileDesc, &entry[z].START_CLUSTER, 2);
-
-    //     read(fileDesc, &entry[z].FILE_SIZE, 4);
-        
-    // }
-    // int y;
-    // for (y = 33; y < 65; y++)
-    // {
-    //     printf("%d byte is %X\n", y, allEntry[y]);
-    // }
-
-    //showInfo();
-
-    // int j;
-
-    // for(j = 0; j < 10; j++)
-    // {
-        //printf("The filename is %.8s.%.3s\n", entry[0].FILENAME, entry[0].EXT);
-        
-    //}
+            f++;
+        }
+    }
 }
 
 void mount(char *file)
@@ -164,8 +163,6 @@ void unmount()
 
 void structure()
 {
-    //int test = ((2*9)+1)*512;
-    //printf("value is %d\n", test);
     if(imgName == NULL)
     {
         printf("\nNo file is mounted please try mounting a file.\n");
@@ -242,4 +239,98 @@ void showsector(int secNum)
         printf("%5X", sec);
     }
 
-}   
+}
+
+void traverse(int l)
+{
+    if (imgName == NULL)
+    {
+        printf("Please try mounting a image.\n");
+        return;
+    }
+    if (l)
+    {
+        printf("        *****************************\n");
+        printf("        ** FILE ATTRIBUTE NOTATION **\n");
+        printf("        **                         **\n");
+        printf("        ** R ------ READ ONLY FILE **\n");
+        printf("        ** S ------ SYSTEM FILE    **\n");
+        printf("        ** H ------ HIDDEN FILE    **\n");
+        printf("        ** A ------ ARCHIVE FILE   **\n");
+        printf("        *****************************\n");
+        printf("\n");
+        int i;
+        int j;
+        for (i = 0; i < boot.MAX_ROOT_DIRS; i++)
+        {
+            if (entry[i].FILENAME != 0x00 && entry[i].START_CLUSTER != 0)
+            {
+                int day = entry[i].CREATION_DATE & DAY_MASK;
+                int month = (entry[i].CREATION_DATE & MONTH_MASK) >> 5;
+                int year = (entry[i].CREATION_DATE & YEAR_MASK) >> 9;
+                year = year + 1980;
+                int sec = entry[i].CREATION_TIME & SEC_MASK;
+                int min = (entry[i].CREATION_TIME & MIN_MASK) >> 5;
+                int hour = (entry[i].CREATION_TIME & HOUR_MASK) >> 11;
+                char attr[6] = {'-', '-', '-', '-', '-'};
+                unsigned char a = entry[i].ATTRIBUTES[0];
+                if (a == READ_ONLY_MASK)
+                    attr[0] = 'R';
+                if (a == HIDDEN_MASK)
+                    attr[1] = 'H';
+                if (a == SYSTEM_MASK)
+                    attr[2] = 'S';
+                if (a == ARCHIVE_MASK)
+                    attr[5] = 'A';
+                if (a == SUBDIRECTORY_MASK)
+                {
+                    for (j = 0; j < 6; j++)
+                        attr[j] = '-';
+                }
+
+                if (entry[i].ATTRIBUTES[0] == SUBDIRECTORY_MASK)
+                {
+                    printf("%.6s    %d/%d/%d %d:%d:%d      < DIR >      /%.8s                 %d\n", attr, month, day, year, hour, min, sec, entry[i].FILENAME, entry[i].START_CLUSTER);
+                    printf("%.6s    %d/%d/%d %d:%d:%d      < DIR >      /%.8s/.                 %d\n", attr, month, day, year, hour, min, sec, entry[i].FILENAME, entry[i].START_CLUSTER);
+                    printf("%.6s    %d/%d/%d %d:%d:%d      < DIR >      /%.8s/..                 %d\n", attr, month, day, year, hour, min, sec, entry[i].FILENAME, 0);
+                }
+                else
+                {
+                    printf("%.6s    %d/%d/%d %d:%d:%d       %lu      /%.8s.%.3s                 %d\n", attr, month, day, year, hour, min, sec, entry[i].FILE_SIZE, entry[i].FILENAME, entry[i].EXT, entry[i].START_CLUSTER);
+                }
+            }
+        }
+    }
+    else
+    {
+        int i;
+        for (i = 0; i < boot.MAX_ROOT_DIRS; i++)
+        {
+            if (entry[i].FILENAME[0] != 0x00 && entry[i].START_CLUSTER != 0)
+            {
+                if (entry[i].ATTRIBUTES[0] == SUBDIRECTORY_MASK)
+                {
+                    printf("/%.8s                       < DIR >\n", entry[i].FILENAME);
+                    printf("/%.8s/.                     < DIR >\n", entry[i].FILENAME);
+                    printf("/%.8s/..                    < DIR >\n", entry[i].FILENAME);
+                }
+                else
+                {
+                    printf("/%.8s.%.3s\n", entry[i].FILENAME, entry[i].EXT);
+                }
+            }
+        }
+    }
+}
+
+void showfile(char *fileName)
+{
+    if(imgName == NULL)
+    {
+        printf("Please try mounting a image.\n");
+        return;
+    }
+    
+
+
+}

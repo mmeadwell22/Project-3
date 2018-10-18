@@ -1,7 +1,7 @@
 #ifndef BOOT_H
 #define BOOT_H
 
-void load();
+void readImg();
 void mount();
 void unmount();
 void structure();
