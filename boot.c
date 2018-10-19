@@ -331,6 +331,57 @@ void showfile(char *fileName)
         return;
     }
     
+    char *fn = '\0';
+    char *ext = '\0';
+    char *full_filename;
+    char *p;
+
+    //parse file name
+    p = strtok(file, ".");
+    if (p)
+        fn = p;
+    
+    //parse extension
+    p = strtok(NULL, ".");
+    if (p)
+        ext = p;
+
+    full_filename = (char *)malloc(strlen(fn) + strlen(ext) + 1);
+    strcpy(full_filename, fn);
+    strcat(full_filename, ext);
+
+    int i = 0;
+    int j = 0;
+    for (i; i < boot.MAX_ROOT_DIRS; i++) {
+        if (entry[i].FILENAME != 0x00 && entry[i].START_CLUSTER != 0) {
+            if (equals(full_filename, (char *)entry[i].FILENAME)) {
+                unsigned char in;
+
+                //move to the first byte of the file
+                lseek(img, ((boot.MAX_ROOT_DIRS / 16) + (boot.SECTORS_PER_FAT * boot.NUM_OF_FATS) - 1) + (boot.BYTES_PER_SECTOR * entry[i].START_CLUSTER), SEEK_SET);
+
+                
+                for (j; j < entry[i].FILE_SIZE; j++) {
+                    /*if (j%16 == 0 || j == 0) {
+                        printf("\n");
+                        printf("%4x", j);
+                    } */
+                    read(&in, 1, 1, img);
+                    printf("%5x", in);
+                }
+
+                printf("\n");
+            }
+        }
+    }
+
+}
 
 
+int equals(char *str1, char *str2) {
+    for (int i = 0; i < strlen(str1); i++) {
+        if (str1[i] != str2[i])
+            return 0;
+    }
+    return 1;
 }
